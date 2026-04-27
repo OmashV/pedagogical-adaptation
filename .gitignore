@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Environment variables / secrets
+.env
+*.key
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data — don't commit large files
+data/raw/
+data/processed/
+data/annotated/*.csv
+data/annotated/*.json
+!data/annotated/.gitkeep
+
+# Models — don't commit checkpoints
+models/lsi/*
+!models/lsi/.gitkeep
+
+# Results
+results/lsi_eval/*
+results/ped_prm_eval/*
+results/demo_runs/*
+!results/lsi_eval/.gitkeep
+!results/ped_prm_eval/.gitkeep
+!results/demo_runs/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
