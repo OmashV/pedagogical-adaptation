@@ -35,13 +35,27 @@ DOCS_DIR = PROJECT_ROOT / "docs"
 
 # ---- API keys (read from .env) ----
 HF_TOKEN = os.getenv("HF_TOKEN")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+# ---- LLM settings (Groq) ----
+GROQ_MODEL = "llama-3.1-8b-instant"  # smaller, much higher effective throughput
+GROQ_RPM_LIMIT = 12  # well under free-tier RPM and TPM limits
+GROQ_REQUEST_DELAY_SEC = 5.0  # 60/12 = 5.0 seconds between calls
 
 # ---- Dataset settings ----
 MATHDIAL_HF_ID = "eth-nlped/mathdial"
 MATHDIAL_LOCAL_RAW_FILE = RAW_DIR / "mathdial" / "mathdial_raw.parquet"
 MATHDIAL_PROCESSED_TURNS_FILE = PROCESSED_DIR / "mathdial_turns.parquet"
+
+# ---- Distant supervision sampling ----
+DISTANT_SAMPLE_PLAN = {
+    "Yes": 400,
+    "Yes, but I had to reveal the answer": 400,
+    "No": 200,
+}
+DISTANT_RANDOM_SEED = 42
 
 # ---- LSI labels (V1 scope) ----
 CONFUSION_TYPES = ["none", "lexical", "conceptual", "procedural"]
