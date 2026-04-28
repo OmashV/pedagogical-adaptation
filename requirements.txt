@@ -14,3 +14,5 @@ pyarrow==17.0.0
 jupyter==1.1.1
 matplotlib==3.9.2
 seaborn==0.13.2
+streamlit==1.39.0
+tqdm==4.66.5
