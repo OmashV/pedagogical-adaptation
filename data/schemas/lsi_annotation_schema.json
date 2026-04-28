@@ -1,0 +1,60 @@
+{
+    "schema_version": "v1.0",
+    "description": "Annotation schema for Learner State Inferrer (LSI) labels on MathDial student turns. Supports both distantly-supervised labels (from MathDial expert fields via LLM classification) and gold labels (hand-annotated).",
+    "fields": {
+      "annotation_id": {
+        "type": "string",
+        "description": "UUID assigned by the labeling pipeline."
+      },
+      "dialogue_id": {
+        "type": "string",
+        "description": "Source dialogue_id from MathDial preprocessed data."
+      },
+      "turn_idx": {
+        "type": "integer",
+        "description": "Index of the student turn within its dialogue."
+      },
+      "student_text": {
+        "type": "string",
+        "description": "The full text of the student turn being labeled."
+      },
+      "context_window": {
+        "type": "string",
+        "description": "The previous up-to-4 turns shown alongside the student turn."
+      },
+      "confusion_type": {
+        "type": "string",
+        "enum": ["none", "lexical", "conceptual", "procedural"],
+        "description": "Dominant type of confusion for this turn."
+      },
+      "misconception_flag": {
+        "type": "integer",
+        "enum": [0, 1],
+        "description": "1 if the turn reveals a stable wrong mental model, 0 otherwise."
+      },
+      "label_source": {
+        "type": "string",
+        "enum": ["distant_supervision", "gold_human", "llm_judge"],
+        "description": "Source of the labels."
+      },
+      "annotator_notes": {
+        "type": "string",
+        "description": "Optional free-text notes (gold labels only).",
+        "required": false
+      },
+      "skip_reason": {
+        "type": "string",
+        "enum": ["", "broken_dialogue", "non_pedagogical", "ambiguous", "other"],
+        "required": false
+      },
+      "annotated_at": {
+        "type": "string",
+        "format": "iso8601"
+      },
+      "annotation_round": {
+        "type": "integer",
+        "enum": [1, 2],
+        "description": "1 for first pass; 2 for self-consistency re-annotation (gold only)."
+      }
+    }
+  }
