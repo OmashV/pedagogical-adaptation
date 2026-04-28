@@ -49,22 +49,29 @@ def explode_to_turns(df: pd.DataFrame) -> pd.DataFrame:
     """
     Convert dialogue-level dataframe to turn-level dataframe.
 
+    Each row in the input dataframe represents ONE dialogue (one student's
+    session on one problem). Note that qid is NOT unique — the same problem
+    can be given to multiple students. We assign a unique dialogue_id by
+    combining qid with the row index in the original dataframe.
+
     Each turn row carries:
-    - qid, question, ground_truth, student_incorrect_solution
-    - student_profile, teacher_described_confusion, self_correctness
+    - dialogue_id (unique per dialogue), qid (problem id), question, ...
     - turn_idx, speaker, move, text
     - context_window: text of up to 4 preceding turns
     """
     rows = []
-    for _, dlg in df.iterrows():
+    for row_idx, dlg in df.iterrows():
+        # Build a unique dialogue id: combine qid with the row index
+        dialogue_id = f"{dlg['qid']}_{row_idx}"
+
         turns = parse_conversation(dlg["conversation"])
         for t in turns:
-            # Build a small context window of the last 4 turns
             ctx = [
                 f"{tt['speaker'].capitalize()}: {tt['text']}"
                 for tt in turns[max(0, t["turn_idx"] - 4):t["turn_idx"]]
             ]
             rows.append({
+                "dialogue_id": dialogue_id,
                 "qid": dlg["qid"],
                 "question": dlg["question"],
                 "ground_truth": dlg.get("ground_truth"),
@@ -111,10 +118,8 @@ def preprocess_and_save(force: bool = False) -> pd.DataFrame:
 if __name__ == "__main__":
     turns = preprocess_and_save(force=True)
     print(f"\nTotal turns: {len(turns)}")
-    print(f"Speaker distribution:\n{turns['speaker'].value_counts()}")
+    print(f"Total dialogues (unique dialogue_id): {turns['dialogue_id'].nunique()}")
+    print(f"Unique qids (problems): {turns['qid'].nunique()}")
+    print(f"\nSpeaker distribution:\n{turns['speaker'].value_counts()}")
     print(f"\nMove distribution (teacher only):")
     print(turns[turns['speaker'] == 'teacher']['move'].value_counts())
-    print(f"\nFirst 3 student turns:")
-    print(turns[turns['speaker'] == 'student'].head(3)[
-        ['qid', 'turn_idx', 'text']
-    ].to_string())
