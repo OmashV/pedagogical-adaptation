@@ -1,51 +1,37 @@
 ---
 
-## 10. Labeling strategy (Path B + mini-A)
+## 11. Synthetic data policy
 
-LSI labels are produced via two complementary methods.
+This project distinguishes between primary and secondary evidence.
 
-### 10.1 Distant supervision (~10,000 turns)
+### Primary (real) evidence — required for all main claims
+- Real dialogues: MathDial (human teachers + expert annotations).
+- Real distant supervision: LLM classification of real teacher
+  confusion descriptions.
+- Real human gold labels: 50 turns annotated by the project author.
+- Real human pilot study (deferred to V2).
 
-For each MathDial dialogue, the original real teacher provided a free-text
-description of the student's confusion in the field
-`teacher_described_confusion`. We use Claude as an automated classifier to
-map that description onto our four-class confusion_type taxonomy
-(none / lexical / conceptual / procedural).
+### Secondary (synthetic) support — restricted use
+Synthetic data is used only in narrow, transparent roles:
 
-Every student turn within a dialogue inherits its dialogue's classified
-confusion_type. The misconception_flag is set to 1 when the dialogue's
-`student_incorrect_solution` field is non-empty (i.e., the data collection
-process seeded a misconception for this dialogue), and 0 otherwise.
+- **Class augmentation:** if a minority class (e.g., procedural) is
+  too small for the model to learn, we augment via LLM paraphrasing
+  of real turns. Augmentation is applied only to training data;
+  validation and test sets are 100% real. Augmentation counts and
+  ratios are reported.
+- **Prompt calibration:** for the cognitive-load dimension (D4),
+  small handcrafted synthetic examples are used as few-shot anchors
+  in the LLM-as-judge prompt. These do not appear in any evaluation
+  set.
+- **Unit test fixtures:** the `tests/` folder uses small synthetic
+  edge-case dialogues to validate code behavior. These have no role
+  in evaluation.
 
-This is **distant supervision** — labels are derived programmatically from
-existing expert metadata rather than annotated turn-by-turn. The trade-off
-is that labels are dialogue-level (turn variation within a dialogue is
-not captured) but the dataset is two orders of magnitude larger than what
-hand annotation would produce for one student in two days.
+### Off-limits
+- Synthetic dialogues used as if they were real evaluation data.
+- Simulated learning outcomes as headline results.
+- Synthetic turns added to the gold test set.
+- LLM-generated student responses used in pilot studies.
 
-### 10.2 Gold human labels (50 turns)
-
-We hand-annotate a stratified 50-turn gold set under this guide. The
-gold set is held out from training and is used for:
-
-- Evaluating the distantly-supervised labels for agreement.
-- Evaluating the trained LSI classifier (held-out test).
-- Detecting systematic disagreement between human, LLM, and distant
-  labels (which would indicate ambiguous class definitions).
-
-### 10.3 LLM-as-judge cross-check
-
-The same 50 gold turns are also labeled by Claude using this guide as
-a system prompt. Cohen's kappa between human-gold and LLM labels is
-reported. This validates the guide itself: if the LLM disagrees
-systematically with the human on one class, that class definition needs
-sharpening before V2.
-
-### 10.4 Acceptance thresholds
-
-- Distant supervision vs gold: Cohen's kappa ≥ 0.45 (this is moderate
-  agreement; lower bound is acceptable because distant labels are
-  dialogue-level and gold are turn-level).
-- LLM-as-judge vs gold: Cohen's kappa ≥ 0.55.
-- Below these, we iterate the prompt or guide and report the iteration
-  in the methodology section.
+All synthetic-data usage is logged and reported in the methodology
+section of the final write-up.
